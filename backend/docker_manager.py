@@ -11,25 +11,24 @@ class DockerManager:
             ssh_port = random.randint(10000, 11000)
             
             os_images = {
-                "ubuntu": "ubuntu:latest",
+                "ubuntu": "rastasheep/ubuntu-sshd:18.04",  
                 "python": "python:3.9-slim",
                 "nginx": "nginx:alpine"
             }
             
             image = os_images.get(config.os, "alpine:latest")
             
+
             container = self.client.containers.run(
                 image=image,
                 name=f"hosting_{config.name}_{random.randint(1000, 9999)}",
                 detach=True,
                 cpu_count=config.cpu,
                 mem_limit=f"{config.ram}m",
-                ports={'22/tcp': ssh_port}, 
-                command="/bin/sh -c 'while true; do sleep 3600; done'"  
+                ports={'22/tcp': ssh_port}
             )
             
-            expires_at = datetime.now() + timedelta(minutes=1) 
-            
+            expires_at = datetime.now() + timedelta(minutes=30)  
             print(f"Контейнер создан: {container.id}, порт: {ssh_port}")
             
             return {
