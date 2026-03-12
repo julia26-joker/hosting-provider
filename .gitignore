@@ -17,3 +17,4 @@ vm_images/
 *.log
 .vscode/
 .idea/
+.venv_wsl/
