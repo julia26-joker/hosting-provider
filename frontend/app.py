@@ -72,10 +72,16 @@ with col2:
 st.markdown("---")
 st.subheader(" Статус системы")
 
+response = requests.get(f"{API_URL}/api/list")
+instances = response.json() if response.status_code == 200 else []
+
+active = sum(1 for i in instances if i['status'] == 'running')
+total = len(instances)
+
 col3, col4, col5 = st.columns(3)
 with col3:
-    st.metric("Активные инстансы", "0")
+    st.metric("Активные инстансы", active)
 with col4:
-    st.metric("Всего создано", "0")
+    st.metric("Всего создано", total)
 with col5:
     st.metric("Свободно ресурсов", "N/A")
