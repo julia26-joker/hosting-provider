@@ -18,7 +18,7 @@ with col1:
     inst_type = st.radio("Тип", ["container", "vm"], format_func=lambda x: "Контейнер" if x == "container" else "Виртуальная машина")
 
     if inst_type == "container":
-        os_options = ["ubuntu", "python", "nginx"]
+        os_options = ["ubuntu"]
     else:
         os_options = ["ubuntu", "alpine", "debian"]
 
@@ -61,7 +61,6 @@ with col2:
     if response.status_code == 200:
         instances = response.json()
         if instances:
-            # Заголовки таблицы
             header = st.columns([2, 1, 1, 1, 1, 1])
             for col, label in zip(header, ["Имя", "Тип", "ОС", "Статус", "SSH порт", "Действие"]):
                 col.markdown(f"**{label}**")

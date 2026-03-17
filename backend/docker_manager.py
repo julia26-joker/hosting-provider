@@ -11,9 +11,7 @@ class DockerManager:
             ssh_port = random.randint(10000, 11000)
             
             os_images = {
-                "ubuntu": "rastasheep/ubuntu-sshd:18.04",  
-                "python": "python:3.9-slim",
-                "nginx": "nginx:alpine"
+                "ubuntu": "rastasheep/ubuntu-sshd:18.04",
             }
             
             image = os_images.get(config.os, "alpine:latest")
