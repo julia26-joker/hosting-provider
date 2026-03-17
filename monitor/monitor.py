@@ -1,10 +1,10 @@
 import time
 import sqlite3
 import sys
-import os
+from pathlib import Path
 from datetime import datetime
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(str(Path(__file__).parent.parent))
 
 from backend.docker_manager import DockerManager
 from backend.qemu_manager import QEMUManager
