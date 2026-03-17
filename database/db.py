@@ -8,7 +8,6 @@ def init_db():
     """Создает таблицы, если их нет"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS instances (
@@ -60,6 +59,15 @@ def add_instance(data):
     conn.commit()
     conn.close()
     return instance_id
+
+def get_instance_by_id(instance_id):
+    """Получает один инстанс по ID"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM instances WHERE id = ?", (instance_id,))
+    row = cursor.fetchone()
+    conn.close()
+    return row
 
 def get_all_instances():
     """Получает список всех инстансов"""

@@ -30,7 +30,6 @@ db.init_db()
 async def create_instance(instance: InstanceCreate):
     
     if instance.type == "container":
-        
         result = docker_mgr.create_container(instance)
         
         if result:
@@ -47,14 +46,13 @@ async def create_instance(instance: InstanceCreate):
             }
             instance_id = db.add_instance(data)
             return {
-                "id": instance_id, 
-                "ssh_port": result['ssh_port'], 
+                "id": instance_id,
+                "ssh_port": result['ssh_port'],
                 "status": "created",
                 "message": f"Контейнер создан! SSH порт: {result['ssh_port']}"
             }
     
     elif instance.type == "vm":
-       
         result = qemu_mgr.create_vm(instance)
         
         if result:
@@ -71,8 +69,8 @@ async def create_instance(instance: InstanceCreate):
             }
             instance_id = db.add_instance(data)
             return {
-                "id": instance_id, 
-                "ssh_port": result['ssh_port'], 
+                "id": instance_id,
+                "ssh_port": result['ssh_port'],
                 "status": "created",
                 "message": f"Виртуалка создана! SSH порт: {result['ssh_port']}"
             }
@@ -101,6 +99,29 @@ async def list_instances():
 
 @app.post("/api/stop/{instance_id}")
 async def stop_instance(instance_id: int):
+    inst = db.get_instance_by_id(instance_id)
+    
+    if not inst:
+        raise HTTPException(status_code=404, detail="Инстанс не найден")
+    
+    inst_type    = inst[2]
+    status       = inst[7]
+    pid          = inst[10]
+    container_id = inst[11]
+
+    if status != "running":
+        raise HTTPException(status_code=400, detail=f"Инстанс уже имеет статус '{status}'")
+
+    if inst_type == "container" and container_id:
+        success = docker_mgr.stop_container(container_id)
+    elif inst_type == "vm" and pid:
+        success = qemu_mgr.stop_vm(pid)
+    else:
+        raise HTTPException(status_code=500, detail="Нет данных для остановки инстанса")
+
+    if not success:
+        raise HTTPException(status_code=500, detail="Не удалось остановить инстанс")
+
     db.update_instance_status(instance_id, "stopped")
     return {"status": "stopped"}
 

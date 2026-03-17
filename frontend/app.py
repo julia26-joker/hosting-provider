@@ -15,26 +15,23 @@ col1, col2 = st.columns([1, 1])
 with col1:
     st.subheader(" Создать новый инстанс")
 
+    inst_type = st.radio("Тип", ["container", "vm"], format_func=lambda x: "Контейнер" if x == "container" else "Виртуальная машина")
+
+    if inst_type == "container":
+        os_options = ["ubuntu", "python", "nginx"]
+    else:
+        os_options = ["ubuntu", "alpine", "debian"]
+
     with st.form("create_form"):
         name = st.text_input("Имя инстанса", "my-instance")
-        
-        inst_type = st.radio("Тип", ["container", "vm"], format_func=lambda x: "Контейнер" if x == "container" else "Виртуальная машина")
-        
-        if inst_type == "container":
-            os_options = ["ubuntu", "python", "nginx"]
-        else:
-            os_options = ["ubuntu", "alpine", "debian"]
-        
         os = st.selectbox("ОС", os_options)
-        
         cpu = st.slider("CPU (ядра)", 1, 4, 1)
         ram = st.slider("RAM (MB)", 256, 4096, 512, step=256)
         disk = st.slider("Диск (GB)", 5, 50, 10)
-        
         ssh_key = st.text_area("SSH ключ (опционально)", "")
-        
+
         submitted = st.form_submit_button("🚀 Запустить")
-        
+
         if submitted:
             with st.spinner("Создаем..."):
                 response = requests.post(
@@ -56,10 +53,10 @@ with col1:
 
 with col2:
     st.subheader("Мои инстансы")
-    
+
     if st.button("Обновить список"):
         st.rerun()
-    
+
     response = requests.get(f"{API_URL}/api/list")
     if response.status_code == 200:
         instances = response.json()
