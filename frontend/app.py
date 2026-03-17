@@ -61,11 +61,31 @@ with col2:
     if response.status_code == 200:
         instances = response.json()
         if instances:
-            df = pd.DataFrame(instances)
-            st.dataframe(
-                df[['name', 'type', 'os', 'status', 'ssh_port', 'created_at']],
-                use_container_width=True
-            )
+            # Заголовки таблицы
+            header = st.columns([2, 1, 1, 1, 1, 1])
+            for col, label in zip(header, ["Имя", "Тип", "ОС", "Статус", "SSH порт", "Действие"]):
+                col.markdown(f"**{label}**")
+
+            st.markdown("---")
+
+            for inst in instances:
+                row = st.columns([2, 1, 1, 1, 1, 1])
+                row[0].write(inst['name'])
+                row[1].write(inst['type'])
+                row[2].write(inst['os'])
+                row[3].write(inst['status'])
+                row[4].write(inst['ssh_port'])
+
+                if inst['status'] == 'running':
+                    if row[5].button("⏹ Стоп", key=f"stop_{inst['id']}"):
+                        res = requests.post(f"{API_URL}/api/stop/{inst['id']}")
+                        if res.status_code == 200:
+                            st.success(f"Инстанс {inst['name']} остановлен")
+                            st.rerun()
+                        else:
+                            st.error("Ошибка остановки")
+                else:
+                    row[5].write("—")
         else:
             st.info("Нет активных инстансов")
 
